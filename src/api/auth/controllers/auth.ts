@@ -101,20 +101,7 @@ export default factories.createCoreController(
           }
         });
 
-        // 为新用户自动创建钱包
-        try {
-          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
-            data: {
-              usdtYue: 0,
-              aiYue: 0,
-              aiTokenBalances: {},
-              user: newUser.id
-            }
-          });
-          console.log(`为新用户 ${newUser.username} 创建钱包成功`);
-        } catch (walletError) {
-          console.error(`为新用户 ${newUser.username} 创建钱包失败:`, walletError);
-        }
+
 
         console.log('新用户创建成功:', newUser);
 
@@ -206,20 +193,7 @@ export default factories.createCoreController(
           }
         });
 
-        // 为管理员用户自动创建钱包
-        try {
-          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
-            data: {
-              usdtYue: 0,
-              aiYue: 0,
-              aiTokenBalances: {},
-              user: firstAdmin.id
-            }
-          });
-          console.log(`为管理员用户 ${firstAdmin.username} 创建钱包成功`);
-        } catch (walletError) {
-          console.error(`为管理员用户 ${firstAdmin.username} 创建钱包失败:`, walletError);
-        }
+
 
         ctx.body = {
           success: true,
