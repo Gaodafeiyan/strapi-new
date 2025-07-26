@@ -67,23 +67,31 @@ export default factories.createCoreController(
           filters: { type: 'authenticated' }
         }) as any[];
 
+        console.log('找到的角色:', defaultRole);
+
         if (defaultRole.length === 0) {
           return ctx.badRequest('系统错误：未找到默认角色');
         }
 
         // 创建新用户（Strapi会自动加密密码）
+        const userData = {
+          username: sanitizeInput(username),
+          email: sanitizeInput(email),
+          password,
+          provider: 'local',
+          confirmed: true,
+          inviteCode: generateInviteCode(),
+          invitedBy: inviteUser[0].id,
+          role: defaultRole[0].id
+        };
+        
+        console.log('创建用户数据:', { ...userData, password: '[HIDDEN]' });
+        
         const newUser = await strapi.entityService.create('plugin::users-permissions.user', {
-          data: {
-            username: sanitizeInput(username),
-            email: sanitizeInput(email),
-            password,
-            provider: 'local',
-            confirmed: true,
-            inviteCode: generateInviteCode(),
-            invitedBy: inviteUser[0].id,
-            role: defaultRole[0].id
-          }
+          data: userData
         });
+        
+        console.log('创建的用户:', newUser);
 
         // 创建用户钱包
         try {

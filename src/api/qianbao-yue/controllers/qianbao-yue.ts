@@ -4,12 +4,27 @@ export default factories.createCoreController('api::qianbao-yue.qianbao-yue' as 
   // 获取当前用户的钱包余额
   async getMyWallet(ctx) {
     try {
+      // 检查用户状态
+      console.log('getMyWallet - ctx.state:', ctx.state);
+      console.log('getMyWallet - ctx.state.user:', ctx.state.user);
+      
+      if (!ctx.state.user) {
+        return ctx.forbidden('用户未认证');
+      }
+      
       const userId = ctx.state.user.id;
+      console.log('getMyWallet - userId:', userId);
+      
+      if (!userId) {
+        return ctx.forbidden('用户ID无效');
+      }
       
       const wallet = await strapi.entityService.findMany('api::qianbao-yue.qianbao-yue', {
         filters: { user: userId },
         populate: ['user']
       });
+
+      console.log('getMyWallet - found wallets:', wallet.length);
 
       if (wallet.length === 0) {
         return ctx.notFound('钱包不存在');
@@ -20,6 +35,7 @@ export default factories.createCoreController('api::qianbao-yue.qianbao-yue' as 
         data: wallet[0]
       };
     } catch (error) {
+      console.error('getMyWallet error:', error);
       ctx.throw(500, `获取钱包失败: ${error.message}`);
     }
   },
@@ -27,6 +43,10 @@ export default factories.createCoreController('api::qianbao-yue.qianbao-yue' as 
   // 更新用户钱包余额
   async updateWallet(ctx) {
     try {
+      if (!ctx.state.user) {
+        return ctx.forbidden('用户未认证');
+      }
+      
       const userId = ctx.state.user.id;
       const { usdtYue, aiYue, aiTokenBalances } = ctx.request.body;
 
