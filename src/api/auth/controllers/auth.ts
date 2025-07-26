@@ -64,7 +64,7 @@ export default factories.createCoreController(
 
         // 获取默认角色（authenticated）
         const [authenticatedRole] = await strapi.entityService.findMany('plugin::users-permissions.role', {
-          filters: { code: 'authenticated' },
+          filters: { type: 'authenticated' },
           limit: 1
         }) as any[];
 
@@ -185,7 +185,7 @@ export default factories.createCoreController(
 
         // 获取管理员角色
         const [adminRole] = await strapi.entityService.findMany('plugin::users-permissions.role', {
-          filters: { code: 'admin' },
+          filters: { type: 'admin' },
           limit: 1
         }) as any[];
 

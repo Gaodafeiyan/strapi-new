@@ -1,16 +1,16 @@
-const { Strapi } = require('@strapi/strapi');
+const strapi = require('@strapi/strapi');
 
 async function fixUserRolesV4() {
   console.log('开始修复历史用户的role_id...');
   
   try {
     // 初始化Strapi
-    const app = await Strapi().load();
+    const app = await strapi().load();
     
     // 1. 获取authenticated角色
     console.log('\n=== 获取Authenticated角色 ===');
     const [authenticatedRole] = await app.entityService.findMany('plugin::users-permissions.role', {
-      filters: { code: 'authenticated' },
+      filters: { type: 'authenticated' },
       limit: 1
     });
     
