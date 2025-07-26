@@ -1,0 +1,5 @@
+[33mf9bdfba[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m 修复钱包403错误问题 - 自动创建默认钱包功能
+[33m3b7a576[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m 添加简化权限修复脚本
+[33m49131f9[m 添加数据库修复和权限修复脚本
+[33ma5e56bd[m 修复users-permissions插件配置，添加默认角色设置
+[33m0e91dae[m 修复钱包API权限和添加调试信息

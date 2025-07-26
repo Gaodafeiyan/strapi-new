@@ -1,20 +1,21 @@
-const { Strapi } = require('@strapi/strapi');
+const axios = require('axios');
 
-async function fixExistingUsersWallets() {
-  console.log('开始为现有用户创建钱包...');
+async function createMissingWallets() {
+  console.log('开始为缺失钱包的用户创建钱包...');
+  
+  const baseURL = 'http://118.107.4.158:1337';
   
   try {
-    // 初始化Strapi
-    const strapi = await Strapi().load();
-    
     // 1. 获取所有用户
     console.log('\n=== 获取所有用户 ===');
-    const users = await strapi.entityService.findMany('plugin::users-permissions.user');
+    const usersResponse = await axios.get(`${baseURL}/api/users`);
+    const users = usersResponse.data;
     console.log(`找到 ${users.length} 个用户`);
     
     // 2. 获取所有钱包
     console.log('\n=== 获取所有钱包 ===');
-    const wallets = await strapi.entityService.findMany('api::qianbao-yue.qianbao-yue');
+    const walletsResponse = await axios.get(`${baseURL}/api/qianbao-yues/all-wallets`);
+    const wallets = walletsResponse.data.data || [];
     console.log(`找到 ${wallets.length} 个钱包`);
     
     // 3. 找出没有钱包的用户
@@ -27,7 +28,6 @@ async function fixExistingUsersWallets() {
     
     if (usersWithoutWallets.length === 0) {
       console.log('✅ 所有用户都有钱包，无需创建');
-      await strapi.destroy();
       return;
     }
     
@@ -35,29 +35,30 @@ async function fixExistingUsersWallets() {
     console.log('\n=== 开始创建钱包 ===');
     for (const user of usersWithoutWallets) {
       try {
-        await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
+        const createResponse = await axios.post(`${baseURL}/api/qianbao-yues`, {
           data: {
             usdtYue: 0,
             aiYue: 0,
             aiTokenBalances: {},
             user: user.id
           }
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
         
         console.log(`✅ 为用户 ${user.username} (ID: ${user.id}) 创建钱包成功`);
       } catch (error) {
-        console.log(`❌ 为用户 ${user.username} (ID: ${user.id}) 创建钱包失败:`, error.message);
+        console.log(`❌ 为用户 ${user.username} (ID: ${user.id}) 创建钱包失败:`, error.response?.data || error.message);
       }
     }
     
     console.log('\n=== 钱包创建完成 ===');
     
-    // 关闭Strapi
-    await strapi.destroy();
-    
   } catch (error) {
-    console.error('脚本执行失败:', error.message);
+    console.error('脚本执行失败:', error.response?.data || error.message);
   }
 }
 
-fixExistingUsersWallets(); 
+createMissingWallets(); 
