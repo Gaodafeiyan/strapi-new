@@ -63,13 +63,14 @@ export default factories.createCoreController(
         }
 
         // 获取默认角色（authenticated）
-        const defaultRole = await strapi.entityService.findMany('plugin::users-permissions.role', {
-          filters: { type: 'authenticated' }
+        const [authenticatedRole] = await strapi.entityService.findMany('plugin::users-permissions.role', {
+          filters: { code: 'authenticated' },
+          limit: 1
         }) as any[];
 
-        console.log('找到的角色:', defaultRole);
+        console.log('找到的角色:', authenticatedRole);
 
-        if (defaultRole.length === 0) {
+        if (!authenticatedRole) {
           return ctx.badRequest('系统错误：未找到默认角色');
         }
 
@@ -82,7 +83,7 @@ export default factories.createCoreController(
           confirmed: true,
           inviteCode: generateInviteCode(),
           invitedBy: inviteUser[0].id,
-          role: defaultRole[0].id
+          role: authenticatedRole.id
         };
         
         console.log('创建用户数据:', { ...userData, password: '[HIDDEN]' });
@@ -96,7 +97,7 @@ export default factories.createCoreController(
             confirmed: true,
             inviteCode: generateInviteCode(),
             invitedBy: inviteUser[0].id,
-            role: defaultRole[0].id
+            role: authenticatedRole.id
           }
         });
 
@@ -183,11 +184,12 @@ export default factories.createCoreController(
         }
 
         // 获取管理员角色
-        const adminRole = await strapi.entityService.findMany('plugin::users-permissions.role', {
-          filters: { type: 'admin' }
+        const [adminRole] = await strapi.entityService.findMany('plugin::users-permissions.role', {
+          filters: { code: 'admin' },
+          limit: 1
         }) as any[];
 
-        if (adminRole.length === 0) {
+        if (!adminRole) {
           return ctx.badRequest('系统错误：未找到管理员角色');
         }
 
@@ -200,7 +202,7 @@ export default factories.createCoreController(
             provider: 'local',
             confirmed: true,
             inviteCode: generateInviteCode(),
-            role: adminRole[0].id
+            role: adminRole.id
           }
         });
 

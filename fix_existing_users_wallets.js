@@ -1,20 +1,20 @@
-const { Strapi } = require('@strapi/strapi');
+const strapi = require('@strapi/strapi');
 
 async function fixExistingUsersWallets() {
   console.log('开始为现有用户创建钱包...');
   
   try {
     // 初始化Strapi
-    const strapi = await Strapi().load();
+    const app = await strapi().load();
     
     // 1. 获取所有用户
     console.log('\n=== 获取所有用户 ===');
-    const users = await strapi.entityService.findMany('plugin::users-permissions.user');
+    const users = await app.entityService.findMany('plugin::users-permissions.user');
     console.log(`找到 ${users.length} 个用户`);
     
     // 2. 获取所有钱包
     console.log('\n=== 获取所有钱包 ===');
-    const wallets = await strapi.entityService.findMany('api::qianbao-yue.qianbao-yue');
+    const wallets = await app.entityService.findMany('api::qianbao-yue.qianbao-yue');
     console.log(`找到 ${wallets.length} 个钱包`);
     
     // 3. 找出没有钱包的用户
@@ -27,7 +27,7 @@ async function fixExistingUsersWallets() {
     
     if (usersWithoutWallets.length === 0) {
       console.log('✅ 所有用户都有钱包，无需创建');
-      await strapi.destroy();
+      await app.destroy();
       return;
     }
     
@@ -35,7 +35,7 @@ async function fixExistingUsersWallets() {
     console.log('\n=== 开始创建钱包 ===');
     for (const user of usersWithoutWallets) {
       try {
-        await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
+        await app.entityService.create('api::qianbao-yue.qianbao-yue', {
           data: {
             usdtYue: 0,
             aiYue: 0,
@@ -53,7 +53,7 @@ async function fixExistingUsersWallets() {
     console.log('\n=== 钱包创建完成 ===');
     
     // 关闭Strapi
-    await strapi.destroy();
+    await app.destroy();
     
   } catch (error) {
     console.error('脚本执行失败:', error.message);
