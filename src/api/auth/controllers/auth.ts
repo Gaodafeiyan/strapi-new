@@ -88,24 +88,34 @@ export default factories.createCoreController(
         console.log('创建用户数据:', { ...userData, password: '[HIDDEN]' });
         
         const newUser = await strapi.entityService.create('plugin::users-permissions.user', {
-          data: userData
+          data: {
+            username: sanitizeInput(username),
+            email: sanitizeInput(email),
+            password,
+            provider: 'local',
+            confirmed: true,
+            inviteCode: generateInviteCode(),
+            invitedBy: inviteUser[0].id,
+            role: defaultRole[0].id
+          }
         });
-        
-        console.log('创建的用户:', newUser);
 
-        // 创建用户钱包
+        // 为新用户自动创建钱包
         try {
-          await strapi.entityService.create('api::qianbao-yue.qianbao-yue' as any, {
+          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
             data: {
-              usdtYue: '0',
-              aiYue: '0',
-              aiTokenBalances: '{}',
+              usdtYue: 0,
+              aiYue: 0,
+              aiTokenBalances: {},
               user: newUser.id
-            } as any
+            }
           });
-        } catch (error) {
-          console.log('钱包创建失败，可能表未生成:', error.message);
+          console.log(`为新用户 ${newUser.username} 创建钱包成功`);
+        } catch (walletError) {
+          console.error(`为新用户 ${newUser.username} 创建钱包失败:`, walletError);
         }
+
+        console.log('新用户创建成功:', newUser);
 
         ctx.body = {
           success: true,
@@ -194,18 +204,19 @@ export default factories.createCoreController(
           }
         });
 
-        // 创建用户钱包
+        // 为管理员用户自动创建钱包
         try {
-          await strapi.entityService.create('api::qianbao-yue.qianbao-yue' as any, {
+          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
             data: {
-              usdtYue: '0',
-              aiYue: '0',
-              aiTokenBalances: '{}',
+              usdtYue: 0,
+              aiYue: 0,
+              aiTokenBalances: {},
               user: firstAdmin.id
-            } as any
+            }
           });
-        } catch (error) {
-          console.log('钱包创建失败，可能表未生成:', error.message);
+          console.log(`为管理员用户 ${firstAdmin.username} 创建钱包成功`);
+        } catch (walletError) {
+          console.error(`为管理员用户 ${firstAdmin.username} 创建钱包失败:`, walletError);
         }
 
         ctx.body = {
