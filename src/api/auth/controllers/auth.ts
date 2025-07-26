@@ -101,8 +101,8 @@ export default factories.createCoreController(
           success: true,
           data: {
             id: newUser.id,
-            username: newUser.username,
-            email: newUser.email,
+            username: (newUser as any).username,
+            email: (newUser as any).email,
             inviteCode: (newUser as any).inviteCode
           },
           message: '注册成功'
@@ -200,8 +200,8 @@ export default factories.createCoreController(
           success: true,
           data: {
             id: firstAdmin.id,
-            username: firstAdmin.username,
-            email: firstAdmin.email,
+            username: (firstAdmin as any).username,
+            email: (firstAdmin as any).email,
             inviteCode: (firstAdmin as any).inviteCode
           },
           message: '初始管理员创建成功'
