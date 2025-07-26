@@ -19,15 +19,31 @@ export default factories.createCoreController('api::qianbao-yue.qianbao-yue' as 
         return ctx.forbidden('用户ID无效');
       }
       
-      const wallet = await strapi.entityService.findMany('api::qianbao-yue.qianbao-yue', {
+      let wallet = await strapi.entityService.findMany('api::qianbao-yue.qianbao-yue', {
         filters: { user: userId },
         populate: ['user']
       });
 
       console.log('getMyWallet - found wallets:', wallet.length);
 
+      // 如果钱包不存在，自动创建一个默认钱包
       if (wallet.length === 0) {
-        return ctx.notFound('钱包不存在');
+        console.log('钱包不存在，自动创建默认钱包');
+        try {
+          const newWallet = await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
+            data: {
+              usdtYue: 0,
+              aiYue: 0,
+              aiTokenBalances: {},
+              user: userId
+            }
+          });
+          wallet = [newWallet];
+          console.log('默认钱包创建成功:', newWallet);
+        } catch (createError) {
+          console.error('创建默认钱包失败:', createError);
+          return ctx.notFound('钱包不存在且无法创建');
+        }
       }
 
       ctx.body = {
