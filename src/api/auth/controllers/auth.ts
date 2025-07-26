@@ -77,6 +77,8 @@ export default factories.createCoreController(
             username: sanitizeInput(username),
             email: sanitizeInput(email),
             password,
+            provider: 'local',
+            confirmed: true,
             inviteCode: generateInviteCode(),
             invitedBy: inviteUser[0].id,
             role: defaultRole[0].id
@@ -177,6 +179,8 @@ export default factories.createCoreController(
             username: sanitizeInput(username),
             email: sanitizeInput(email),
             password,
+            provider: 'local',
+            confirmed: true,
             inviteCode: generateInviteCode(),
             role: adminRole[0].id
           }
