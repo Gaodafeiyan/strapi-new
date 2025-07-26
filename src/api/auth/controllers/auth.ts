@@ -85,7 +85,7 @@ export default factories.createCoreController(
 
         // 创建用户钱包
         try {
-          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
+          await strapi.entityService.create('api::qianbao-yue.qianbao-yue' as any, {
             data: {
               usdtYue: '0',
               aiYue: '0',
@@ -184,7 +184,7 @@ export default factories.createCoreController(
 
         // 创建用户钱包
         try {
-          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
+          await strapi.entityService.create('api::qianbao-yue.qianbao-yue' as any, {
             data: {
               usdtYue: '0',
               aiYue: '0',
