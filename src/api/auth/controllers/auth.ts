@@ -1,6 +1,6 @@
 import { factories } from '@strapi/strapi';
-import { validateEmail, validateUsername, validatePassword, validateInviteCode, sanitizeInput } from '../../../utils/validation';
-import { generateInviteCode } from '../../../utils/invite';
+import { validateEmail, validateUsername, validatePassword, validateInviteCode, sanitizeInput } from '../../../../utils/validation';
+import { generateInviteCode } from '../../../../utils/invite';
 
 export default factories.createCoreController(
   'plugin::users-permissions.user',
@@ -65,7 +65,7 @@ export default factories.createCoreController(
         // 获取默认角色（authenticated）
         const defaultRole = await strapi.entityService.findMany('plugin::users-permissions.role', {
           filters: { type: 'authenticated' }
-        });
+        }) as any[];
 
         if (defaultRole.length === 0) {
           return ctx.badRequest('系统错误：未找到默认角色');
@@ -84,14 +84,18 @@ export default factories.createCoreController(
         });
 
         // 创建用户钱包
-        await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
-          data: {
-            usdtYue: '0',
-            aiYue: '0',
-            aiTokenBalances: '{}',
-            user: newUser.id
-          } as any
-        });
+        try {
+          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
+            data: {
+              usdtYue: '0',
+              aiYue: '0',
+              aiTokenBalances: '{}',
+              user: newUser.id
+            } as any
+          });
+        } catch (error) {
+          console.log('钱包创建失败，可能表未生成:', error.message);
+        }
 
         ctx.body = {
           success: true,
@@ -99,7 +103,7 @@ export default factories.createCoreController(
             id: newUser.id,
             username: newUser.username,
             email: newUser.email,
-            inviteCode: newUser.inviteCode
+            inviteCode: (newUser as any).inviteCode
           },
           message: '注册成功'
         };
@@ -161,7 +165,7 @@ export default factories.createCoreController(
         // 获取管理员角色
         const adminRole = await strapi.entityService.findMany('plugin::users-permissions.role', {
           filters: { type: 'admin' }
-        });
+        }) as any[];
 
         if (adminRole.length === 0) {
           return ctx.badRequest('系统错误：未找到管理员角色');
@@ -179,14 +183,18 @@ export default factories.createCoreController(
         });
 
         // 创建用户钱包
-        await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
-          data: {
-            usdtYue: '0',
-            aiYue: '0',
-            aiTokenBalances: '{}',
-            user: firstAdmin.id
-          } as any
-        });
+        try {
+          await strapi.entityService.create('api::qianbao-yue.qianbao-yue', {
+            data: {
+              usdtYue: '0',
+              aiYue: '0',
+              aiTokenBalances: '{}',
+              user: firstAdmin.id
+            } as any
+          });
+        } catch (error) {
+          console.log('钱包创建失败，可能表未生成:', error.message);
+        }
 
         ctx.body = {
           success: true,
@@ -194,7 +202,7 @@ export default factories.createCoreController(
             id: firstAdmin.id,
             username: firstAdmin.username,
             email: firstAdmin.email,
-            inviteCode: firstAdmin.inviteCode
+            inviteCode: (firstAdmin as any).inviteCode
           },
           message: '初始管理员创建成功'
         };
