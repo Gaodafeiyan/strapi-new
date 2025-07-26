@@ -13,6 +13,20 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "username": { "type": "string", "minLength": 3, "required": true, "unique": true },
+    "email": { "type": "email", "required": true, "unique": true },
+    "provider": { "type": "string" },
+    "password": { "type": "password", "private": true, "minLength": 6 },
+    "resetPasswordToken": { "type": "string", "private": true },
+    "confirmationToken": { "type": "string", "private": true },
+    "confirmed": { "type": "boolean", "default": false },
+    "blocked": { "type": "boolean", "default": false },
+    "role": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.role",
+      "inversedBy": "users"
+    },
     "inviteCode": {
       "type": "string",
       "unique": true,
