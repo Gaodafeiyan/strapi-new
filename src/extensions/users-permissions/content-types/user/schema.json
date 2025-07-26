@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "up_users",
+  "info": {
+    "name": "user",
+    "description": "",
+    "singularName": "user",
+    "pluralName": "users",
+    "displayName": "User"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "inviteCode": {
+      "type": "string",
+      "unique": true,
+      "configurable": false
+    },
+    "invitedBy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "xiaji"
+    },
+    "xiaji": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "invitedBy"
+    },
+    "qianbaoYue": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::qianbao-yue.qianbao-yue",
+      "mappedBy": "user"
+    }
+  }
+} 
